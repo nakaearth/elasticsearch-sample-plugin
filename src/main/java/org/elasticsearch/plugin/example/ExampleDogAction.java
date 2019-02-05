@@ -1,26 +1,55 @@
 package org.elasticsearch.plugin.example;
 
+// import org.elasticsearch.client.node.NodeClient;
+// import org.elasticsearch.common.inject.Inject;
+// import org.elasticsearch.common.Table;
+// import org.elasticsearch.common.settings.Settings;
+// import org.elasticsearch.rest.BytesRestResponse;
+// import org.elasticsearch.rest.RestController;
+// import org.elasticsearch.rest.RestRequest;
+// import org.elasticsearch.rest.action.cat.AbstractCatAction;
+// import org.elasticsearch.rest.BaseRestHandler;
+// import org.elasticsearch.rest.action.cat.RestTable;
+
 import org.elasticsearch.client.node.NodeClient;
-import org.elasticsearch.common.Table;
+import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.rest.BaseRestHandler;
 import org.elasticsearch.rest.BytesRestResponse;
 import org.elasticsearch.rest.RestController;
 import org.elasticsearch.rest.RestRequest;
+import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.rest.action.cat.AbstractCatAction;
-import org.elasticsearch.rest.action.cat.RestTable;
 
 import static org.elasticsearch.rest.RestRequest.Method.GET;
 import static org.elasticsearch.rest.RestRequest.Method.POST;
 
+import java.io.IOException;
+import java.util.List;
+
 /**
  * Example of adding a cat action with a plugin.
  */
-public class ExampleDogAction extends AbstractCatAction {
+public class ExampleDogAction extends BaseRestHandler {
 
+    private static final String DOG = "-`@`-";
+    private static final String DOG_NL = DOG + "\n";
+    private final String HELP;
+
+    @Inject
+    // ExampleDogAction(Settings settings, RestController controller, List<AbstractCatAction> catActions) {
     ExampleDogAction(final Settings settings, final RestController controller) {
         super(settings);
-        controller.registerHandler(GET, "/_cat/example", this);
-        controller.registerHandler(POST, "/_cat/example", this);
+        controller.registerHandler(GET, "/_dog", this);
+        controller.registerHandler(GET, "/_dob/example", this);
+        controller.registerHandler(POST, "/_dog/example", this);
+        StringBuilder sb = new StringBuilder();
+        sb.append(DOG_NL);
+        sb.append("Hello form dog example action.");
+        // for (AbstractCatAction catAction : catActions) {
+        //     catAction.documentation(sb);
+        // }
+        HELP = sb.toString();
     }
 
     @Override
@@ -28,6 +57,12 @@ public class ExampleDogAction extends AbstractCatAction {
         return "rest_handler_dog_example";
     }
 
+        @Override
+    public RestChannelConsumer prepareRequest(final RestRequest request, final NodeClient client) throws IOException {
+        return channel -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, HELP));
+    }
+
+    /**
     @Override
     protected RestChannelConsumer doCatRequest(final RestRequest request, final NodeClient client) {
         final String message = request.param("message", "Hello from Dogt Example action");
@@ -62,4 +97,5 @@ public class ExampleDogAction extends AbstractCatAction {
         table.endHeaders();
         return table;
     }
+    **/
 }
