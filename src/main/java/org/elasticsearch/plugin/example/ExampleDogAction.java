@@ -1,16 +1,5 @@
 package org.elasticsearch.plugin.example;
 
-// import org.elasticsearch.client.node.NodeClient;
-// import org.elasticsearch.common.inject.Inject;
-// import org.elasticsearch.common.Table;
-// import org.elasticsearch.common.settings.Settings;
-// import org.elasticsearch.rest.BytesRestResponse;
-// import org.elasticsearch.rest.RestController;
-// import org.elasticsearch.rest.RestRequest;
-// import org.elasticsearch.rest.action.cat.AbstractCatAction;
-// import org.elasticsearch.rest.BaseRestHandler;
-// import org.elasticsearch.rest.action.cat.RestTable;
-
 import org.elasticsearch.client.node.NodeClient;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.settings.Settings;
@@ -37,7 +26,6 @@ public class ExampleDogAction extends BaseRestHandler {
     private final String HELP;
 
     @Inject
-    // ExampleDogAction(Settings settings, RestController controller, List<AbstractCatAction> catActions) {
     ExampleDogAction(final Settings settings, final RestController controller) {
         super(settings);
         controller.registerHandler(GET, "/_dog", this);
