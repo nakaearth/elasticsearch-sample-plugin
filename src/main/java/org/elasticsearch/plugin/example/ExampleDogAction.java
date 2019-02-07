@@ -1,5 +1,13 @@
 package org.elasticsearch.plugin.example;
 
+import org.elasticsearch.action.admin.cluster.node.info.NodeInfo;
+import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
+import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
+import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
+import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
+import org.elasticsearch.client.node.NodeClient;
+import org.elasticsearch.cluster.node.DiscoveryNode;
+import org.elasticsearch.cluster.node.DiscoveryNodes;
 import org.elasticsearch.client.node.NodeClient;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.settings.Settings;
@@ -47,6 +55,13 @@ public class ExampleDogAction extends BaseRestHandler {
 
         @Override
     public RestChannelConsumer prepareRequest(final RestRequest request, final NodeClient client) throws IOException {
+        # TODO: Clusterの情報を引っ張ってきてNodeのの中のShardの情報を引っ張り出したい。分布状況を見えるようにしたい
+        final ClusterStateRequest clusterStateRequest = new ClusterStateRequest();
+        clusterStateRequest.clear().nodes(true);
+        clusterStateRequest.local(request.paramAsBoolean("local", clusterStateRequest.local()));
+        clusterStateRequest.masterNodeTimeout(request.paramAsTime("master_timeout", clusterStateRequest.masterNodeTimeout()));
+
+
         return channel -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, HELP));
     }
 
