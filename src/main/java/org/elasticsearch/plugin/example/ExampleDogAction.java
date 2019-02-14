@@ -13,6 +13,8 @@ import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.Table;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.plugins.PluginInfo;
+import org.elasticsearch.http.HttpInfo;
+import org.elasticsearch.monitor.os.OsInfo;
 import org.elasticsearch.rest.BaseRestHandler;
 import org.elasticsearch.rest.BytesRestResponse;
 import org.elasticsearch.rest.RestController;
@@ -45,9 +47,6 @@ public class ExampleDogAction extends BaseRestHandler {
         StringBuilder sb = new StringBuilder();
         sb.append(DOG_NL);
         sb.append("Hello form dog example action.");
-        // for (AbstractCatAction catAction : catActions) {
-        //     catAction.documentation(sb);
-        // }
         HELP = sb.toString();
     }
 
@@ -84,6 +83,7 @@ public class ExampleDogAction extends BaseRestHandler {
         table.startHeaders();
         table.addCell("id", "default:false;desc:unique node id");
         table.addCell("name", "alias:n;desc:node name");
+        table.addCell("hostName", "alias:n;desc:node host name");
         table.addCell("component", "alias:c;desc:component");
         table.addCell("version", "alias:v;desc:component version");
         table.addCell("description", "alias:d;default:false;desc:plugin details");
@@ -103,6 +103,7 @@ public class ExampleDogAction extends BaseRestHandler {
                 table.startRow();
                 table.addCell(node.getId());
                 table.addCell(node.getName());
+                table.addCell(node.getHostName());
                 table.addCell(pluginInfo.getName());
                 table.addCell(pluginInfo.getVersion());
                 table.addCell(pluginInfo.getDescription());
