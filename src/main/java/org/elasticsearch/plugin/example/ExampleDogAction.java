@@ -5,49 +5,36 @@ import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
+import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.client.node.NodeClient;
+import org.elasticsearch.cluster.ClusterState;
+import org.elasticsearch.client.Requests;
 import org.elasticsearch.cluster.node.DiscoveryNode;
 import org.elasticsearch.cluster.node.DiscoveryNodes;
-import org.elasticsearch.client.node.NodeClient;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.Table;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.plugins.PluginInfo;
-import org.elasticsearch.http.HttpInfo;
-import org.elasticsearch.monitor.os.OsInfo;
 import org.elasticsearch.rest.BaseRestHandler;
-import org.elasticsearch.rest.BytesRestResponse;
 import org.elasticsearch.rest.RestController;
 import org.elasticsearch.rest.RestRequest;
-import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.rest.RestResponse;
 import org.elasticsearch.rest.action.RestActionListener;
 import org.elasticsearch.rest.action.RestResponseListener;
 import org.elasticsearch.rest.action.cat.RestTable;
 
 import static org.elasticsearch.rest.RestRequest.Method.GET;
-import static org.elasticsearch.rest.RestRequest.Method.POST;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Example of adding a cat action with a plugin.
  */
 public class ExampleDogAction extends BaseRestHandler {
-
-    private static final String DOG = "-`@`-";
-    private static final String DOG_NL = DOG + "\n";
-    private final String HELP;
-
     @Inject
     ExampleDogAction(final Settings settings, final RestController controller) {
         super(settings);
         controller.registerHandler(GET, "/_dog", this);
-        StringBuilder sb = new StringBuilder();
-        sb.append(DOG_NL);
-        sb.append("Hello form dog example action.");
-        HELP = sb.toString();
     }
 
     @Override
@@ -58,11 +45,13 @@ public class ExampleDogAction extends BaseRestHandler {
         @Override
     public RestChannelConsumer prepareRequest(final RestRequest request, final NodeClient client) throws IOException {
         // TODO: Clusterの情報を引っ張ってきてNodeのの中のShardの情報を引っ張り出したい。分布状況を見えるようにしたい
-        final ClusterStateRequest clusterStateRequest = new ClusterStateRequest();
-        clusterStateRequest.clear().nodes(true);
+        final ClusterStateRequest clusterStateRequest = Requests.clusterStateRequest();
+        clusterStateRequest.indicesOptions(IndicesOptions.fromRequest(request, clusterStateRequest.indicesOptions()));
         clusterStateRequest.local(request.paramAsBoolean("local", clusterStateRequest.local()));
         clusterStateRequest.masterNodeTimeout(request.paramAsTime("master_timeout", clusterStateRequest.masterNodeTimeout()));
-
+        if (request.hasParam("wait_for_metadata_version")) {
+//            clusterStateRequest.waitForMetaDataVersion(request.paramAsLong("wait_for_metadata_version", 0));
+        }
         return channel -> client.admin().cluster().state(clusterStateRequest, new RestActionListener<ClusterStateResponse>(channel) {
             @Override
             public void processResponse(final ClusterStateResponse clusterStateResponse) throws Exception {
@@ -78,7 +67,7 @@ public class ExampleDogAction extends BaseRestHandler {
         });
     }
 
-    protected Table getTableWithHeader(final RestRequest request) {
+    private Table getTableWithHeader(final RestRequest request) {
         Table table = new Table();
         table.startHeaders();
         table.addCell("id", "default:false;desc:unique node id");
