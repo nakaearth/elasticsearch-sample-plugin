@@ -21,12 +21,11 @@ import static org.elasticsearch.rest.action.cat.RestTable.buildHelpWidths;
 import static org.elasticsearch.rest.action.cat.RestTable.pad;
 
 public abstract class AbstractBaseAction extends BaseRestHandler {
-
     public AbstractBaseAction(Settings settings) {
         super(settings);
     }
 
-    protected abstract RestChannelConsumer doCatRequest(RestRequest request, NodeClient client);
+    protected abstract RestChannelConsumer doRequest(RestRequest request, NodeClient client);
 
     protected abstract void documentation(StringBuilder sb);
 
@@ -57,7 +56,7 @@ public abstract class AbstractBaseAction extends BaseRestHandler {
                         new BytesRestResponse(RestStatus.OK, BytesRestResponse.TEXT_CONTENT_TYPE, bytesOutput.bytes()));
             };
         } else {
-            return doCatRequest(request, client);
+            return doRequest(request, client);
         }
     }
 
