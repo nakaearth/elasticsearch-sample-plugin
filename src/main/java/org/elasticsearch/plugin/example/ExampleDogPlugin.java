@@ -16,15 +16,12 @@ import java.util.function.Supplier;
 
 import static java.util.Collections.singletonList;
 
-public class ExamplePlugin extends Plugin implements ActionPlugin {
+public class ExampleDogPlugin extends Plugin implements ActionPlugin {
     @Override
-    public List<RestHandler> getRestHandlers(final Settings settings,
-                                             final RestController restController,
-                                             final ClusterSettings clusterSettings,
-                                             final IndexScopedSettings indexScopedSettings,
-                                             final SettingsFilter settingsFilter,
-                                             final IndexNameExpressionResolver indexNameExpressionResolver,
-                                             final Supplier<DiscoveryNodes> nodesInCluster) {
+    public List<RestHandler> getRestHandlers(final Settings settings, final RestController restController,
+            final ClusterSettings clusterSettings, final IndexScopedSettings indexScopedSettings,
+            final SettingsFilter settingsFilter, final IndexNameExpressionResolver indexNameExpressionResolver,
+            final Supplier<DiscoveryNodes> nodesInCluster) {
 
         return singletonList(new ExampleDogAction(settings, restController));
     }
